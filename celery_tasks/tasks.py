@@ -24,6 +24,7 @@ def long_running(self, **kwargs):
     max_value = kwargs.get('max_value', 10)
     timer_value = kwargs.get('timer_value', 1)
     for i in range(1, max_value):
+        logger.info('Current Loop - {}'.format(i))
         time.sleep(i * timer_value)
 
     return [max_value, timer_value]

@@ -24,7 +24,7 @@ def trigger_tasks():
     max_value = request.args.get('max_value', 10, int)
     timer_value = request.args.get('timer_value', 1, int)
 
-    long_running.s(max_value, timer_value).apply_asyn()
+    long_running.s(max_value=max_value, timer_value=timer_value).apply_async()
 
     return jsonify({'max_value': max_value, 'timer_value': timer_value})
 
