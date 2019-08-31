@@ -1,0 +1,36 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.7
+
+  pre_build:
+    commands:
+    - echo Logging in to Amazon ECR...
+    - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
+    - echo $CODEBUILD_WEBHOOK_HEAD_REF
+    - REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$REPO_NAME
+    - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+    - IMAGE_TAG=${COMMIT_HASH:=latest}
+    - echo IMAGE_TAG - $IMAGE_TAG
+
+  build:
+    commands:
+    - echo Build dockers started on `date`
+    - echo Building the WEB API Docker image...
+    - docker build -f docker/web/Dockerfile -t $REPOSITORY_URI:web:latest .
+    - docker tag $REPOSITORY_URI:web:latest $REPOSITORY_URI:web:$IMAGE_TAG
+    - echo Building the CELERY Docker image...
+    - docker build -f docker/celery/Dockerfile -t $REPOSITORY_URI:celery:latest .
+    - docker tag $REPOSITORY_URI:celery:latest $REPOSITORY_URI:celery:$IMAGE_TAG
+
+  post_build:
+    commands:
+    - echo Pushing the WEB API Docker images...
+    - docker push $REPOSITORY_URI:web:latest
+    - docker push $REPOSITORY_URI:web:$IMAGE_TAG
+    - echo Pushing the CELERY Docker images...
+    - docker push $REPOSITORY_URI:celery:latest
+    - docker push $REPOSITORY_URI:celery:$IMAGE_TAG
+    - echo Pushing docker images completed on `date`
