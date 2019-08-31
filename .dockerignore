@@ -1,0 +1,13 @@
+#ignore below extensions
+.git
+.ipynb_checkpoints/*
+/notebooks/*
+/unused/*
+Dockerfile
+.DS_Store
+.gitignore
+README.md
+env.*
+.env
+.dockerignore
+/logs/*
