@@ -20,17 +20,17 @@ phases:
     - echo Build dockers started on `date`
     - echo Building the WEB API Docker image...
     - docker build -f docker/web/Dockerfile -t $REPOSITORY_URI:latest_web .
-    - docker tag $REPOSITORY_URI:latest_web $REPOSITORY_URI:$IMAGE_TAG_web
+    - docker tag $REPOSITORY_URI:latest_web $REPOSITORY_URI:${IMAGE_TAG}_web
     - echo Building the CELERY Docker image...
     - docker build -f docker/celery/Dockerfile -t $REPOSITORY_URI:latest_celery .
-    - docker tag $REPOSITORY_URI:latest_celery $REPOSITORY_URI:$IMAGE_TAG_celery
+    - docker tag $REPOSITORY_URI:latest_celery $REPOSITORY_URI:${IMAGE_TAG}_celery
 
   post_build:
     commands:
     - echo Pushing the WEB API Docker images...
     - docker push $REPOSITORY_URI:latest_web
-    - docker push $REPOSITORY_URI:$IMAGE_TAG_web
+    - docker push $REPOSITORY_URI:${IMAGE_TAG}_web
     - echo Pushing the CELERY Docker images...
     - docker push $REPOSITORY_URI:latest_celery
-    - docker push $REPOSITORY_URI:$IMAGE_TAG_celery
+    - docker push $REPOSITORY_URI:${IMAGE_TAG}_celery
     - echo Pushing docker images completed on `date`
