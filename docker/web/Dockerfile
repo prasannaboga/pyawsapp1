@@ -20,4 +20,4 @@ USER $USER
 
 EXPOSE 5000
 
-CMD flask run
+CMD flask run --host=0.0.0.0
