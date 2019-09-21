@@ -28,3 +28,10 @@ def long_running(self, **kwargs):
         time.sleep(i * timer_value)
 
     return [max_value, timer_value]
+
+
+@celery.task(bind=True, queue="ball")
+def scheduled_task(self, **kwargs):
+    time_stamp = kwargs.get('time_stamp')
+    logger.info('This scheduled at {}')
+    return [time_stamp]
