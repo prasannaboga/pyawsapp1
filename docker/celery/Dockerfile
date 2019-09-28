@@ -18,4 +18,4 @@ RUN pipenv install --system --deploy
 
 USER $USER
 
-CMD celery -A celery_tasks.celery worker -l INFO -E --autoscale=25,1 -Q apple,ball
+CMD celery -A celery_tasks.celery worker -l INFO -E --autoscale=2,1 -Q apple,ball,cat
