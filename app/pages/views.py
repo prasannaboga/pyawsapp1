@@ -6,6 +6,8 @@ from flask import render_template, jsonify, request, g
 from .base import pages
 
 from celery_tasks.tasks import long_running
+from multiprocessing import Pool
+from multiprocessing import cpu_count
 
 
 @pages.route('/')
@@ -33,6 +35,20 @@ def trigger_tasks():
 def page_one():
     app.logger.info('This is page one')
     return jsonify({'request_time': g.request_time()})
+
+
+def f(x):
+    return x * x
+
+
+@pages.route('/page_two')
+def page_two():
+    app.logger.info('This is page two start')
+    processes = cpu_count()
+    pool = Pool(1000)
+    x = pool.map(f, range(processes))
+    app.logger.info('This is page two end')
+    return jsonify({'request_time': g.request_time(), 'x': x})
 
 
 @pages.route('/long_request')
