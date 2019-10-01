@@ -43,22 +43,21 @@ def scheduled_task(self, **kwargs):
 
 @celery.task(bind=True, queue="cat")
 def parent_task(self, **kwargs):
-    items_count = kwargs.get('items_count', 5)
+    items_count = kwargs.get('items_count')
     logger.info('items_count = '.format(items_count))
-    l = ()
-    for i in range(1, items_count+1):
-        ct = child_task.s(i)
-        l = l + (ct,)
-    res = chain(l)()
-    return res
+    child_task.s(items_count, 1).apply_async(countdown=10)
+    return [items_count]
 
 
 @celery.task(bind=True, queue="cat")
-def child_task(self, item):
-    if not item:
-        raise Exception('No item found')
-    logger.info('item = {}'.format(item))
-    return [item]
+def child_task(self, items_count, i):
+    logger.info('**i = '.format(i))
+    if i >= items_count:
+        logger.info('Inside if')
+    else:
+        j = i + 1
+        child_task.s(items_count, j).apply_async(countdown=10)
+    return [i]
 
 
 @celery.task(bind=True, queue="cat")

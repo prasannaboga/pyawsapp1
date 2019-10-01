@@ -29,6 +29,12 @@ def trigger_tasks():
     return jsonify({'max_value': max_value, 'timer_value': timer_value})
 
 
+@pages.route('/page_one')
+def page_one():
+    app.logger.info('This is page one')
+    return jsonify({'request_time': g.request_time()})
+
+
 @pages.route('/long_request')
 def long_request():
     max_value = request.args.get('max_value', 10, int)
