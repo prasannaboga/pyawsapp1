@@ -1,2 +1,2 @@
-from .base import celery
+from .base import celery, BaseTask
 from .tasks import add_together

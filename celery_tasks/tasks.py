@@ -5,7 +5,6 @@ from celery import chain
 from .base import celery
 from celery.utils.log import get_task_logger
 
-
 logger = get_task_logger(__name__)
 
 
@@ -23,6 +22,7 @@ def default_queue_task(a):
     return a
 
 
+@celery.task(bind=True, queue="apple")
 def long_running(self, **kwargs):
     max_value = kwargs.get('max_value', 10)
     timer_value = kwargs.get('timer_value', 1)
@@ -61,5 +61,15 @@ def child_task(self, items_count, i):
 
 @celery.task(bind=True, queue="cat")
 def parent_final_task(self, **kwargs):
-
     return ['i']
+
+
+@celery.task(base=BaseTask, bind=True, queue="cat")
+def error_task(self):
+    try:
+        print(self.request.id)
+        raise Exception('I m Exception')
+        return self.request.id
+    except Exception as ex:
+        print(str(ex))
+        raise ex

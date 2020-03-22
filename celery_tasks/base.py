@@ -1,6 +1,7 @@
 import os
 
-from celery import Celery
+from celery.signals import before_task_publish
+from celery import Celery, Task
 from flask import Flask
 
 
@@ -29,3 +30,13 @@ flask_app.config.update(
 )
 
 celery = make_celery(flask_app)
+
+
+class BaseTask(Task):
+    def on_failure(self, exc, task_id, args, kwargs, einfo):
+        print('On Failure - {}'.format(task_id))
+
+
+@before_task_publish.connect()
+def before_task_publish(properties=None, headers=None, body=None, **kwargs):
+    print('I m in before_task_publish')
