@@ -5,7 +5,7 @@ from flask import render_template, jsonify, request, g
 
 from .base import pages
 
-from celery_tasks.tasks import long_running
+from celery_tasks import tasks
 from multiprocessing import Pool
 from multiprocessing import cpu_count
 
@@ -26,7 +26,7 @@ def trigger_tasks():
     max_value = request.args.get('max_value', 10, int)
     timer_value = request.args.get('timer_value', 1, int)
 
-    long_running.s(max_value=max_value, timer_value=timer_value).apply_async()
+    tasks.long_running.s(max_value=max_value, timer_value=timer_value).apply_async()
 
     return jsonify({'max_value': max_value, 'timer_value': timer_value})
 

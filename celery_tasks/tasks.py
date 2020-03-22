@@ -23,7 +23,6 @@ def default_queue_task(a):
     return a
 
 
-@celery.task(bind=True, queue="apple")
 def long_running(self, **kwargs):
     max_value = kwargs.get('max_value', 10)
     timer_value = kwargs.get('timer_value', 1)
