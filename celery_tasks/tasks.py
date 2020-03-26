@@ -2,7 +2,7 @@ import time
 
 from celery import group
 from celery import chain
-from .base import celery
+from .base import celery, BaseTask
 from celery.utils.log import get_task_logger
 
 logger = get_task_logger(__name__)
@@ -69,6 +69,17 @@ def error_task(self):
     try:
         print(self.request.id)
         raise Exception('I m Exception')
+        return self.request.id
+    except Exception as ex:
+        print(str(ex))
+        raise ex
+
+
+@celery.task(base=BaseTask, bind=True, queue="cat")
+def sample_task_one(self):
+    try:
+        # time.sleep(5)
+        logger.info('I m task - {}'.format(self.name))
         return self.request.id
     except Exception as ex:
         print(str(ex))

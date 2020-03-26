@@ -1,4 +1,5 @@
 import os
+import boto3
 
 from celery.signals import before_task_publish
 from celery import Celery, Task
@@ -30,6 +31,7 @@ flask_app.config.update(
 )
 
 celery = make_celery(flask_app)
+cloudwatch = boto3.client('cloudwatch')
 
 
 class BaseTask(Task):
@@ -38,5 +40,25 @@ class BaseTask(Task):
 
 
 @before_task_publish.connect()
-def before_task_publish(properties=None, headers=None, body=None, **kwargs):
-    print('I m in before_task_publish')
+def before_task_publish(**kwargs):
+    print('--------------------------')
+    # print('I m in before_task_publish')
+    print(cloudwatch)
+    response = cloudwatch.put_metric_data(
+        MetricData=[
+            {
+                'MetricName': 'TASKS_COUNT',
+                'Dimensions': [
+                    {
+                        'Name': 'task',
+                        'Value': 'one'
+                    }
+                ],
+                'Unit': 'None',
+                'Value': 1
+            },
+        ],
+        Namespace='CELERY/PYAWSAPP1'
+    )
+    print(response)
+    print('--AFTER RESPONSE--')
