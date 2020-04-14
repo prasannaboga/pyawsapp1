@@ -1,13 +1,14 @@
+import random
 import time
+from multiprocessing import Pool
+from multiprocessing import cpu_count
 
+import boto3
 from flask import current_app as app
 from flask import render_template, jsonify, request, g
 
-from .base import pages
-
 from celery_tasks import tasks
-from multiprocessing import Pool
-from multiprocessing import cpu_count
+from .base import pages
 
 
 @pages.route('/')
@@ -64,3 +65,31 @@ def long_request():
         {'max_value': max_value,
          'timer_value': timer_value,
          'request_time': g.request_time()})
+
+
+@pages.route('/custom-metrics-example1')
+def custom_metrics_example1():
+    cloudwatch = boto3.client('cloudwatch')
+    task_names = ['one', 'two', 'three', 'four']
+    task_name = random.choice(task_names)
+    metric_data = [
+        {
+            'MetricName': 'TASKS_COUNT',
+            'Dimensions': [
+                {
+                    'Name': 'task_name',
+                    'Value': 'one'
+                }
+            ],
+            'Unit': 'None',
+            'Value': int(request.args.get('value', 1))
+        },
+    ]
+    namespace = 'PYAWSAPP1/APPLICATION_TASKS'
+
+    response = cloudwatch.put_metric_data(
+        MetricData=metric_data,
+        Namespace=namespace
+    )
+
+    return jsonify(response)
